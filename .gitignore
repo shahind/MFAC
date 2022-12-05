@@ -1,1 +1,7 @@
 **/__pycache__/
+src/setup.py
+src/setup.cfg
+src/LICENSE.txt
+src/dist
+src/MFAC.egg-info
+src/release
