@@ -8,9 +8,9 @@ class CompactFormDynamicLinearization(MFACInterface):
                  model,  # plant model
                  iteration_function,  # will be called in each iteration
                  eta,  # 0 <eta <=2   Weighting Factor
-                 miu,  # 0 < miu      Weighting Factor
-                 rou,  # 0 < rou <= 1 Step Factor
-                 lamda,  # 0 < lambda
+                 mu,  # 0 < mu      Weighting Factor
+                 rho,  # 0 < rho <= 1 Step Factor
+                 labda,  # 0 < labda
                  reference_output,
                  simulation_time=10,
                  time_step=0.01,
@@ -18,9 +18,9 @@ class CompactFormDynamicLinearization(MFACInterface):
                  ):
         self.max_iterations = int(simulation_time / time_step)
         self.eta = eta
-        self.miu = miu
-        self.rou = rou
-        self.lamda = lamda
+        self.mu = mu
+        self.rho = rho
+        self.labda = labda
         self.Yd = reference_output
         self.is_mimo = mimo
         self.model = model
@@ -44,17 +44,17 @@ class CompactFormDynamicLinearization(MFACInterface):
     def calculate_control(self):
         y_pre, y = self.model.observe(2, full_state=False)
         self.fai = self.fai + self.eta * (y - y_pre - self.fai * np.transpose(self.du)) * self.du / (
-                    self.miu + self.du * np.transpose(self.du))
+                    self.mu + self.du * np.transpose(self.du))
         if self.fai < 1e-5:
             self.fai = 0.5
         u_pre = self.u
         y_d = self.Yd[self.iteration + 1]
         if self.nu == 1:
-            self.u = self.u + self.rou * self.fai * (y_d - y) / (self.lamda + np.power(self.fai, 2))
+            self.u = self.u + self.rho * self.fai * (y_d - y) / (self.labda + np.power(self.fai, 2))
         else:
-            self.u = self.u + self.rou * self.fai * (
+            self.u = self.u + self.rho * self.fai * (
                         (y_d - y) - self.fai[1:self.nu - 1] * np.transpose(self.du[0: self.nu - 2])) / (
-                                 self.lamda + np.power(self.fai[1], 2))
+                                 self.labda + np.power(self.fai[1], 2))
         self.du = self.u - u_pre
         self.Fai = np.append(self.Fai, self.fai)
         self.U = np.append(self.U, self.u)

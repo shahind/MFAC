@@ -40,10 +40,10 @@ controller = CompactFormDynamicLinearization(model=model,
                                              time_step=step_time,
                                              reference_output=y_d,
                                              simulation_time=total_time,
-                                             lamda=1,
+                                             labda=1,
                                              eta=1,
-                                             miu=1,
-                                             rou=0.45,
+                                             mu=1,
+                                             rho=0.45,
                                              )
 
 # run the simulation
