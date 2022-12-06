@@ -5,3 +5,4 @@ src/LICENSE.txt
 src/dist
 src/MFAC.egg-info
 src/release
+.idea
