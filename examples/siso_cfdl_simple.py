@@ -1,15 +1,9 @@
-# This is temporary fix to import module from parent folder
-# It will be removed when package is published
-import sys
-
-sys.path.append('../src/')
-# End of fix
-
-# import the plant and controller from MFAC
-from src.mfac.plants.siso import Model1
-from src.mfac.controllers.cfdl import CompactFormDynamicLinearization
 import numpy as np
 import matplotlib.pyplot as plt
+
+# import the plant and controller from MFAC
+from mfac.plants.siso import Model1
+from mfac.controllers import CompactFormDynamicLinearization
 
 # define the model and set the initial values
 model = Model1(initial_state=np.array([0]))

@@ -16,7 +16,7 @@ The following code shows the functionality of MFAC Toolbox in controlling a simp
 import numpy as np
 import matplotlib.pyplot as plt
 from mfac.plants.siso import Model1
-from mfac.controllers.cfdl import CompactFormDynamicLinearization
+from mfac.controllers import CompactFormDynamicLinearization
 
 # define the model and set the initial values
 model = Model1(initial_state=np.array([0]))
@@ -30,7 +30,7 @@ y_d = np.zeros(int(total_time / step_time) + 1)
 for k in range(int(total_time / step_time) + 1):
     y_d[k] = 0.5 + 0.5*np.power(-1, np.round(k/200))
 
-# log function which will be run after each iteration
+# log function which will be ran after each iteration
 def log_function(cfdl):
     print('iteration: ', cfdl.iteration)
 
