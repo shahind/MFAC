@@ -3,6 +3,9 @@
 <a><img align="right" src="https://img.shields.io/pypi/v/MFAC"/></a>
 <a><img align="right" src="https://img.shields.io/pypi/pyversions/MFAC"/></a>
 <a><img align="right" src="https://img.shields.io/github/languages/code-size/shahind/MFAC?color=blueviolet"/></a>
+<p align="center">
+  <img src="https://github.com/shahind/MFAC/raw/main/logo.png" />
+</p>
 Model Free Adaptive Control Toolbox for Python
 
 This project aims to provide a simple and fast python package for model-free adaptive control. The package includes compact form dynamic linearization (CFDL), partial form dynamic linearization (PFDL) and full form dynamic linearization (FFDL) model free adaptive control methods both for SISO and MIMO systems.
