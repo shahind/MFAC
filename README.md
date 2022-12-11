@@ -101,4 +101,5 @@ Currently developed models:
 - [x] Simple MIMO model 1 (Model1)
 
 Currently tested scenarios:
-- [x] CFDL on Model1
+- [x] CFDL on SISO Model1
+- [x] CFDL on MIMO Model1
