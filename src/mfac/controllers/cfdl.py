@@ -15,6 +15,7 @@ class CompactFormDynamicLinearization(MFACInterface):
                  simulation_time=10,
                  time_step=0.01,
                  mimo=False,
+                 f0=None,
                  ):
         self.max_iterations = int(simulation_time / time_step)
         self.eta = eta
@@ -24,14 +25,16 @@ class CompactFormDynamicLinearization(MFACInterface):
         self.Yd = reference_output
         self.is_mimo = mimo
         self.model = model
-        self.nu = self.model.number_of_inputs
         self.iteration_function = iteration_function
-        self.u = np.array([0] * self.nu)
-        self.fai = np.array([0] * self.nu)
-        self.du = np.array([0] * self.nu)
-        self.U = np.array([np.array([0] * self.nu)])
-        self.Fai = np.array([np.array([0] * self.nu)])
-        self.dU = np.array([np.array([0] * self.nu)])
+        self.u = np.matrix(np.zeros([self.model.number_of_inputs, 1]))
+        if f0 is None:
+            self.f = np.matrix(np.zeros([self.model.number_of_outputs, self.model.number_of_inputs]))
+        else:
+            self.f = f0
+        self.du = self.u
+        self.U = np.array([self.u])
+        self.F = np.array([self.f])
+        self.dU = np.array([self.du])
         self.iteration = 0
 
     def run(self):
@@ -43,22 +46,19 @@ class CompactFormDynamicLinearization(MFACInterface):
 
     def calculate_control(self):
         y_pre, y = self.model.observe(2, full_state=False)
-        self.fai = self.fai + self.eta * (y - y_pre - self.fai * np.transpose(self.du)) * self.du / (
-                    self.mu + self.du * np.transpose(self.du))
-        if self.fai < 1e-5:
-            self.fai = 0.5
+        self.f = self.f + self.eta * (y - y_pre - self.f * self.du) * self.du.transpose() / (
+                    self.mu + np.power(np.linalg.norm(self.u), 2))
+        # limit f between bounds
+        self.f -= 50 * (self.f > 50)
+        self.f += 0.5 * (self.f < 1e-5)
+
         u_pre = self.u
         y_d = self.Yd[self.iteration + 1]
-        if self.nu == 1:
-            self.u = self.u + self.rho * self.fai * (y_d - y) / (self.labda + np.power(self.fai, 2))
-        else:
-            self.u = self.u + self.rho * self.fai * (
-                        (y_d - y) - self.fai[1:self.nu - 1] * np.transpose(self.du[0: self.nu - 2])) / (
-                                 self.labda + np.power(self.fai[1], 2))
+        self.u = self.u + self.rho * self.f.transpose() * (y_d - y) / (self.labda + np.power(np.linalg.norm(self.f), 2))
         self.du = self.u - u_pre
-        self.Fai = np.append(self.Fai, self.fai)
+        self.F = np.append(self.F, self.f)
         self.U = np.append(self.U, self.u)
         self.dU = np.append(self.dU, self.du)
 
     def calculate_zero_control(self):
-        self.u = np.array([0] * self.nu)
+        self.u = np.matrix(np.zeros([self.model.number_of_inputs, 1]))

@@ -2,19 +2,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # import the plant and controller from MFAC
-from mfac.plants.siso import Model1
+from mfac.plants.mimo import Model1
 from mfac.controllers import CompactFormDynamicLinearization
 
 # define the model and set the initial values
-model = Model1(initial_state=np.array([0]))
+model = Model1(initial_state=np.matrix('0.0; 0.0; 0.0; 0.0'))
 
 # desired output
 total_time = 8
 step_time = 0.01
 
-y_d = np.zeros(int(total_time / step_time) + 1)
+y_d = np.array([np.matrix('0.75; 0.5')])
 for k in range(int(total_time / step_time) + 1):
-    y_d[k] = 0.5 + 0.5*np.power(-1, np.round(k/200))
+    yd = np.matrix('0.0; 0.0')
+    yd[0] = 0.5 + 0.25 * np.cos(0.25 * np.pi * k / 100) + 0.25 * np.sin(0.5 * np.pi * k / 100)
+    yd[1] = 0.5 + 0.25 * np.sin(0.25 * np.pi * k / 100) + 0.25 * np.sin(0.5 * np.pi * k / 100)
+    y_d = np.append(y_d, [yd], axis=0)
 
 # log function which will be run after each iteration
 def log_function(cfdl):
@@ -30,18 +33,25 @@ controller = CompactFormDynamicLinearization(model=model,
                                              labda=1,
                                              eta=1,
                                              mu=1,
-                                             rho=0.45,
+                                             rho=1.8,
+                                             f0=np.matrix('0.5 0.2;0.2 0.5')
                                              )
 
 # run the simulation
 controller.run()
 
 # plot the output
-fig, ax = plt.subplots()
-ax.plot(model.Y)
-ax.plot(y_d)
-ax.set(xlabel='time (t)', ylabel='output (y)',
-       title='system output')
-ax.grid()
-# fig.savefig("test.png")
+plt.title('Output')
+plt.subplot(2, 1, 1)
+plt.plot(model.Y[:, 0])
+plt.plot(y_d[:, 0])
+plt.xlabel("k")
+plt.ylabel("y1(k)")
+plt.grid()
+plt.subplot(2, 1, 2)
+plt.plot(model.Y[:, 1])
+plt.plot(y_d[:, 1])
+plt.xlabel("k")
+plt.ylabel("y2(k)")
+plt.grid()
 plt.show()

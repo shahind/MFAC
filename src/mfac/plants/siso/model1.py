@@ -7,6 +7,13 @@ import matplotlib.pyplot as plt
 # A simple SISO model based on "Model Free Adaptive Control" book
 # X = Y : with size [1]
 # U : size [1]
+def dynamic(x, u, prev_x, prev_u):
+    curr_u = 1.5 * u - 1.5 * np.power(u, 2) + 0.5 * np.power(u, 3)
+    prev_u = 1.5 * prev_u - 1.5 * (np.power(prev_u, 2)) + 0.5 * np.power(prev_u, 3)
+    next_x = 0.6 * x - 0.1 * prev_x + 1.2 * curr_u - 0.1 * prev_u
+    return next_x
+
+
 class Model1(PlantInterface):
     @PlantInterface.initializer
     def __init__(self,
@@ -35,14 +42,24 @@ class Model1(PlantInterface):
     def step(self, u):
         self.u = u
         self.U = np.append(self.U, self.u)
-        curr_u = 1.5 * u - 1.5 * np.power(u, 2) + 0.5 * np.power(u, 3)
-        prev_u = 1.5 * self.U[self.time-1] - 1.5 * (np.power(self.U[self.time-1], 2)) + 0.5 * np.power(self.U[self.time-1], 3)
-        self.x = 0.6 * self.Y[self.time] - 0.1 * self.Y[self.time-1] + 1.2 * curr_u - 0.1 * prev_u
+        self.x = dynamic(self.x, self.u, self.X[self.time-1], self.U[self.time-1])
         self.y = self.x
         self.X = np.append(self.X, self.x)
         self.Y = np.append(self.Y, self.y)
         self.time += 1
         return self.y
+
+    def predict(self, u, full_state=True):
+        x = self.x
+        x_prev = self.X[self.time-1]
+        x_predict = np.array([x])
+        u_prev = self.u
+        for u_k in u:
+            x = dynamic(x, u_k, x_prev, u_prev)
+            x_predict = np.append(x_predict, x)
+            x_prev = x
+            u_prev = u_k
+        return x_predict
 
     def observe(self, time_window, full_state=True):
         if full_state:

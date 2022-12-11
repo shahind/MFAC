@@ -41,6 +41,9 @@ class PlantInterface:
     def step(self, u):
         pass
 
+    def predict(self, u):
+        pass
+
     def render(self, mode):
         pass
 
