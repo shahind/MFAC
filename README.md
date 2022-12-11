@@ -66,9 +66,9 @@ ax.grid()
 # fig.savefig("test.png")
 plt.show()
 ```
-the output will be like:
+the output will be like:  
 ![img.png](img.png)
-
+  
 # Components
 To control a system using the current MFAC library, two major components are required; model and controller.
 ## Model
