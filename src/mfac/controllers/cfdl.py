@@ -12,12 +12,11 @@ class CompactFormDynamicLinearization(MFACInterface):
                  rho,  # 0 < rho <= 1 Step Factor
                  labda,  # 0 < labda
                  reference_output,
-                 simulation_time=10,
-                 time_step=0.01,
+                 max_steps=1000,
                  mimo=False,
                  f0=None,
                  ):
-        self.max_iterations = int(simulation_time / time_step)
+        self.max_iterations = int(max_steps)
         self.eta = eta
         self.mu = mu
         self.rho = rho
@@ -49,7 +48,6 @@ class CompactFormDynamicLinearization(MFACInterface):
         self.f = self.f + self.eta * (y - y_pre - self.f * self.du) * self.du.transpose() / (
                     self.mu + np.power(np.linalg.norm(self.u), 2))
         # limit f between bounds
-        self.f -= 50 * (self.f > 50)
         self.f += 0.5 * (self.f < 1e-5)
 
         u_pre = self.u

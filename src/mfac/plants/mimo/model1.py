@@ -30,7 +30,8 @@ class Model1(PlantInterface):
         self.number_of_states = 4
         self.number_of_outputs = 2
         self.x = initial_state
-        self.y = np.matrix('1,0,0,0;0,0,1,0') * self.x
+        self.c = np.matrix('1,0,0,0;0,0,1,0')
+        self.y = self.c * self.x
         self.u = np.matrix('0; 0')
         self.X = np.array([self.x])
         self.Y = np.array([self.y])
@@ -50,7 +51,7 @@ class Model1(PlantInterface):
         self.u = u
         self.U = np.append(self.U, [self.u], axis=0)
         self.x = dynamic(self.x, self.u, self.time)
-        self.y = np.matrix('1,0,0,0;0,0,1,0') * self.x
+        self.y = self.c * self.x
         self.X = np.append(self.X, [self.x], axis=0)
         self.Y = np.append(self.Y, [self.y], axis=0)
         self.time += 1
@@ -64,7 +65,7 @@ class Model1(PlantInterface):
         y_predict = np.array([y])
         for u_k in u:
             x = dynamic(x, u_k, k)
-            y = np.matrix('1,0,0,0;0,0,1,0') * x
+            y = self.c * x
             x_predict = np.append(x_predict, [x], axis=0)
             y_predict = np.append(y_predict, [y], axis=0)
             k += 1

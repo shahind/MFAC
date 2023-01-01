@@ -9,11 +9,10 @@ from mfac.controllers import CompactFormDynamicLinearization
 model = Model1(initial_state=np.array([0]))
 
 # desired output
-total_time = 8
-step_time = 0.01
+total_steps = 800
 
-y_d = np.zeros(int(total_time / step_time) + 1)
-for k in range(int(total_time / step_time) + 1):
+y_d = np.zeros(total_steps + 1)
+for k in range(total_steps + 1):
     y_d[k] = 0.5 + 0.5*np.power(-1, np.round(k/200))
 
 # log function which will be run after each iteration
@@ -24,9 +23,8 @@ def log_function(cfdl):
 # define the controller
 controller = CompactFormDynamicLinearization(model=model,
                                              iteration_function=log_function,
-                                             time_step=step_time,
                                              reference_output=y_d,
-                                             simulation_time=total_time,
+                                             max_steps=total_steps,
                                              labda=1,
                                              eta=1,
                                              mu=1,
